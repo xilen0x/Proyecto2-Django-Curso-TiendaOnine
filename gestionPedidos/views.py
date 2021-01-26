@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from gestionPedidos.models import Clientes, Articulos, Pedidos
+from django.core.mail import send_mail
+from django.conf import settings
 
 # Create your views here.
 
@@ -28,7 +30,18 @@ def buscar(request):
 
     return HttpResponse(mensaje)
 
+
+# Vista para el formulario de contacto:
 def contacto(request):
 
+    if request.method == 'POST':
+
+        subject = request.POST["subject"]
+        message = request.POST["message"] + " " + request.POST["email"]
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = ["noxgnox0@gmail.com"]
+        send_mail(subject, message, email_from, recipient_list)
+
+        return render(request, "gracias.html")
+
     return render(request, "contacto.html")
-    
