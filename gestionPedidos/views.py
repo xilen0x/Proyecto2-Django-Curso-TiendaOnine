@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from gestionPedidos.models import Clientes, Articulos, Pedidos
 from django.core.mail import send_mail
 from django.conf import settings
+from gestionPedidos.forms import Formulario_Contacto
 
 # Create your views here.
 
@@ -36,12 +37,19 @@ def contacto(request):
 
     if request.method == 'POST':
 
-        subject = request.POST["subject"]
-        message = request.POST["message"] + " " + request.POST["email"]
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = ["noxgnox0@gmail.com"]
-        send_mail(subject, message, email_from, recipient_list)
+       miFormulario = Formulario_Contacto(request.POST)
 
-        return render(request, "gracias.html")
+       if miFormulario.is_valid():
 
-    return render(request, "contacto.html")
+           infoForm = miFormulario.cleaned_data
+           #datos q queremos recuperar del formulario (ver forms.py y formulario_contacto.html)
+           send_mail(infoForm['asunto'], infoForm['mensaje'],
+           infoForm.get('email',''),['noxgnox0@gmail.com'],)
+
+           return render(request, "gracias.html")
+
+    else:
+        miFormulario = Formulario_Contacto()
+
+    return render(request, "formulario_contacto.html", {"form":miFormulario})
+        
